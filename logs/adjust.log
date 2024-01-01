@@ -1,0 +1,73 @@
+2023-12-31 12:16:04,855 - aggregated_data_importer - INFO - HTTP Error 401: Unauthorized
+Traceback (most recent call last):
+  File "G:\Visual Studio Code\ezg_project\adjust\main.py", line 7, in <module>
+    df = pull_adjust_data(start_date, end_date)
+  File "G:\Visual Studio Code\ezg_project\adjust\aggregated_data_importer.py", line 77, in pull_adjust_data
+    response = pd.read_csv(api_url)
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 948, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 611, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 1448, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 1705, in _make_engine
+    self.handles = get_handle(
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 718, in get_handle
+    ioargs = _get_filepath_or_buffer(
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 372, in _get_filepath_or_buffer
+    with urlopen(req_info) as req:
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 274, in urlopen
+    return urllib.request.urlopen(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 525, in open
+    response = meth(req, response)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 634, in http_response
+    response = self.parent.error(
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 563, in error
+    return self._call_chain(*args)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 496, in _call_chain
+    result = func(*args)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 643, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 401: Unauthorized
+2023-12-31 12:18:13,192 - aggregated_data_importer - INFO - Adjust API ERROR: HTTP Error 401: Unauthorized
+Traceback (most recent call last):
+  File "G:\Visual Studio Code\ezg_project\adjust\aggregated_data_importer.py", line 76, in pull_adjust_data
+    response = pd.read_csv(api_url)
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 948, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 611, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 1448, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 1705, in _make_engine
+    self.handles = get_handle(
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 718, in get_handle
+    ioargs = _get_filepath_or_buffer(
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 372, in _get_filepath_or_buffer
+    with urlopen(req_info) as req:
+  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 274, in urlopen
+    return urllib.request.urlopen(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 525, in open
+    response = meth(req, response)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 634, in http_response
+    response = self.parent.error(
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 563, in error
+    return self._call_chain(*args)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 496, in _call_chain
+    result = func(*args)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 643, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 401: Unauthorized
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "G:\Visual Studio Code\ezg_project\adjust\main.py", line 7, in <module>
+    df = pull_adjust_data(start_date, end_date)
+  File "G:\Visual Studio Code\ezg_project\adjust\aggregated_data_importer.py", line 80, in pull_adjust_data
+    raise Exception("Adjust API ERROR: {}".format(e))
+Exception: Adjust API ERROR: HTTP Error 401: Unauthorized
