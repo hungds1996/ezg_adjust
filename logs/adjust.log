@@ -1,73 +1,138 @@
-2023-12-31 12:16:04,855 - aggregated_data_importer - INFO - HTTP Error 401: Unauthorized
-Traceback (most recent call last):
-  File "G:\Visual Studio Code\ezg_project\adjust\main.py", line 7, in <module>
-    df = pull_adjust_data(start_date, end_date)
-  File "G:\Visual Studio Code\ezg_project\adjust\aggregated_data_importer.py", line 77, in pull_adjust_data
-    response = pd.read_csv(api_url)
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 948, in read_csv
-    return _read(filepath_or_buffer, kwds)
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 611, in _read
-    parser = TextFileReader(filepath_or_buffer, **kwds)
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 1448, in __init__
-    self._engine = self._make_engine(f, self.engine)
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 1705, in _make_engine
-    self.handles = get_handle(
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 718, in get_handle
-    ioargs = _get_filepath_or_buffer(
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 372, in _get_filepath_or_buffer
-    with urlopen(req_info) as req:
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 274, in urlopen
-    return urllib.request.urlopen(*args, **kwargs)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 216, in urlopen
-    return opener.open(url, data, timeout)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 525, in open
-    response = meth(req, response)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 634, in http_response
-    response = self.parent.error(
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 563, in error
-    return self._call_chain(*args)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 496, in _call_chain
-    result = func(*args)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 643, in http_error_default
-    raise HTTPError(req.full_url, code, msg, hdrs, fp)
-urllib.error.HTTPError: HTTP Error 401: Unauthorized
-2023-12-31 12:18:13,192 - aggregated_data_importer - INFO - Adjust API ERROR: HTTP Error 401: Unauthorized
-Traceback (most recent call last):
-  File "G:\Visual Studio Code\ezg_project\adjust\aggregated_data_importer.py", line 76, in pull_adjust_data
-    response = pd.read_csv(api_url)
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 948, in read_csv
-    return _read(filepath_or_buffer, kwds)
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 611, in _read
-    parser = TextFileReader(filepath_or_buffer, **kwds)
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 1448, in __init__
-    self._engine = self._make_engine(f, self.engine)
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\parsers\readers.py", line 1705, in _make_engine
-    self.handles = get_handle(
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 718, in get_handle
-    ioargs = _get_filepath_or_buffer(
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 372, in _get_filepath_or_buffer
-    with urlopen(req_info) as req:
-  File "G:\Visual Studio Code\ezg_project\ezg_venv\lib\site-packages\pandas\io\common.py", line 274, in urlopen
-    return urllib.request.urlopen(*args, **kwargs)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 216, in urlopen
-    return opener.open(url, data, timeout)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 525, in open
-    response = meth(req, response)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 634, in http_response
-    response = self.parent.error(
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 563, in error
-    return self._call_chain(*args)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 496, in _call_chain
-    result = func(*args)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\urllib\request.py", line 643, in http_error_default
-    raise HTTPError(req.full_url, code, msg, hdrs, fp)
-urllib.error.HTTPError: HTTP Error 401: Unauthorized
 
-During handling of the above exception, another exception occurred:
+2024-01-02 14:44:19,201 - aggregated_data_importer - INFO - Created table data-import-409408.temp_tables.hero_survival_adjust
+2024-01-02 14:56:58,474 - aggregated_data_importer - INFO - 2 rows + to file + hero_survival
+2024-01-02 14:57:04,754 - aggregated_data_importer - INFO - 400 Column name rn is ambiguous at [12:15]
 
+(job ID: 505f6036-0203-4749-b540-aeb520faa111)
+
+                                                                                                   -----Query Job SQL Follows-----                                                                                                   
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:
+   2:        create or replace table `data-import-409408.temp_tables.hero_survival_adjust`
+   3:        partition by day
+   4:        as
+   5:        select *
+   6:        from (
+   7:        SELECT 
+   8:            *,
+   9:            row_number() over(partition by campaign, network, app_token, country_code, adgroup, country, app, partner_name, adgroup_network, day, store_id, store_type, source_network, app_id order by updated_date desc) as rn
+  10:        FROM `data-import-409408.temp_tables.hero_survival_adjust`
+  11:        )
+  12:        where rn=1
+  13:    
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
 Traceback (most recent call last):
-  File "G:\Visual Studio Code\ezg_project\adjust\main.py", line 7, in <module>
-    df = pull_adjust_data(start_date, end_date)
-  File "G:\Visual Studio Code\ezg_project\adjust\aggregated_data_importer.py", line 80, in pull_adjust_data
-    raise Exception("Adjust API ERROR: {}".format(e))
-Exception: Adjust API ERROR: HTTP Error 401: Unauthorized
+  File "D:\4 Weeks\ezg_adjust\main.py", line 8, in <module>
+    total_rows = import_data_bigquery(df)
+  File "D:\4 Weeks\ezg_adjust\aggregated_data_importer.py", line 174, in import_data_bigquery
+    total_rows += csv_to_bigquery(app=app)
+  File "D:\4 Weeks\ezg_adjust\aggregated_data_importer.py", line 190, in csv_to_bigquery
+    update_data(table_id)
+  File "D:\4 Weeks\ezg_adjust\aggregated_data_importer.py", line 311, in update_data
+    query_job.result()
+  File "C:\Python310\lib\site-packages\google\cloud\bigquery\job\query.py", line 1447, in result
+    do_get_result()
+  File "C:\Python310\lib\site-packages\google\api_core\retry.py", line 283, in retry_wrapped_func
+    return retry_target(
+  File "C:\Python310\lib\site-packages\google\api_core\retry.py", line 190, in retry_target
+    return target()
+  File "C:\Python310\lib\site-packages\google\cloud\bigquery\job\query.py", line 1437, in do_get_result
+    super(QueryJob, self).result(retry=retry, timeout=timeout)
+  File "C:\Python310\lib\site-packages\google\cloud\bigquery\job\base.py", line 727, in result
+    return super(_AsyncJob, self).result(timeout=timeout, **kwargs)
+  File "C:\Python310\lib\site-packages\google\api_core\future\polling.py", line 137, in result
+    raise self._exception
+google.api_core.exceptions.BadRequest: 400 Column name rn is ambiguous at [12:15]
+
+(job ID: 505f6036-0203-4749-b540-aeb520faa111)
+
+                                                                                                   -----Query Job SQL Follows-----                                                                                                   
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:
+   2:        create or replace table `data-import-409408.temp_tables.hero_survival_adjust`
+   3:        partition by day
+   4:        as
+   5:        select *
+   6:        from (
+   7:        SELECT 
+   8:            *,
+   9:            row_number() over(partition by campaign, network, app_token, country_code, adgroup, country, app, partner_name, adgroup_network, day, store_id, store_type, source_network, app_id order by updated_date desc) as rn
+  10:        FROM `data-import-409408.temp_tables.hero_survival_adjust`
+  11:        )
+  12:        where rn=1
+  13:    
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+2024-01-02 14:58:39,747 - aggregated_data_importer - INFO - 2 rows + to file + hero_survival
+2024-01-02 14:58:40,962 - aggregated_data_importer - INFO - Created table data-import-409408.temp_tables.hero_survival_adjust
+2024-01-02 14:58:46,252 - aggregated_data_importer - INFO - 400 Syntax error: Expected end of input but got identifier "ecept" at [5:18]
+
+(job ID: 44530270-8c3c-4a82-87f5-20765c239591)
+
+                                                                                                   -----Query Job SQL Follows-----                                                                                                   
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:
+   2:        create or replace table `data-import-409408.temp_tables.hero_survival_adjust`
+   3:        partition by day
+   4:        as
+   5:        select * ecept(rn)
+   6:        from (
+   7:        SELECT 
+   8:            *,
+   9:            row_number() over(partition by campaign, network, app_token, country_code, adgroup, country, app, partner_name, adgroup_network, day, store_id, store_type, source_network, app_id order by updated_date desc) as rn
+  10:        FROM `data-import-409408.temp_tables.hero_survival_adjust`
+  11:        )
+  12:        where rn=1
+  13:    
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+Traceback (most recent call last):
+  File "D:\4 Weeks\ezg_adjust\main.py", line 8, in <module>
+    total_rows = import_data_bigquery(df)
+  File "D:\4 Weeks\ezg_adjust\aggregated_data_importer.py", line 174, in import_data_bigquery
+    total_rows += csv_to_bigquery(app=app)
+  File "D:\4 Weeks\ezg_adjust\aggregated_data_importer.py", line 190, in csv_to_bigquery
+    update_data(table_id)
+  File "D:\4 Weeks\ezg_adjust\aggregated_data_importer.py", line 311, in update_data
+    query_job.result()
+  File "C:\Python310\lib\site-packages\google\cloud\bigquery\job\query.py", line 1447, in result
+    do_get_result()
+  File "C:\Python310\lib\site-packages\google\api_core\retry.py", line 283, in retry_wrapped_func
+    return retry_target(
+  File "C:\Python310\lib\site-packages\google\api_core\retry.py", line 190, in retry_target
+    return target()
+  File "C:\Python310\lib\site-packages\google\cloud\bigquery\job\query.py", line 1437, in do_get_result
+    super(QueryJob, self).result(retry=retry, timeout=timeout)
+  File "C:\Python310\lib\site-packages\google\cloud\bigquery\job\base.py", line 727, in result
+    return super(_AsyncJob, self).result(timeout=timeout, **kwargs)
+  File "C:\Python310\lib\site-packages\google\api_core\future\polling.py", line 137, in result
+    raise self._exception
+google.api_core.exceptions.BadRequest: 400 Syntax error: Expected end of input but got identifier "ecept" at [5:18]
+
+(job ID: 44530270-8c3c-4a82-87f5-20765c239591)
+
+                                                                                                   -----Query Job SQL Follows-----                                                                                                   
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:
+   2:        create or replace table `data-import-409408.temp_tables.hero_survival_adjust`
+   3:        partition by day
+   4:        as
+   5:        select * ecept(rn)
+   6:        from (
+   7:        SELECT 
+   8:            *,
+   9:            row_number() over(partition by campaign, network, app_token, country_code, adgroup, country, app, partner_name, adgroup_network, day, store_id, store_type, source_network, app_id order by updated_date desc) as rn
+  10:        FROM `data-import-409408.temp_tables.hero_survival_adjust`
+  11:        )
+  12:        where rn=1
+  13:    
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+2024-01-02 15:05:48,159 - aggregated_data_importer - INFO - 2 rows + to file + hero_survival
+2024-01-02 15:05:49,287 - aggregated_data_importer - INFO - Created table data-import-409408.temp_tables.hero_survival_adjust
+2024-01-02 15:05:58,897 - aggregated_data_importer - INFO - App {'app_name': 'Hero Survival', 'info': {'table_id': 'data-import-409408.temp_tables.hero_survival_adjust', 'app_token': 'wlf2mllai4n4', 'app_id': 'hero_survival'}}: Imported 2 rows
+2024-01-02 15:13:45,658 - aggregated_data_importer - INFO - Pulling data from 2023-12-26 to 2023-12-31
+2024-01-02 15:13:48,913 - aggregated_data_importer - INFO - Importing data of Hero Survival
+2024-01-02 15:13:48,918 - aggregated_data_importer - INFO - Pulled 2 rows to file hero_survival
+2024-01-02 15:13:57,947 - aggregated_data_importer - INFO - Table data-import-409408.temp_tables.hero_survival_adjust: Imported 0 rows

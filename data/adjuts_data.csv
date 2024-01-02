@@ -1,1 +1,3 @@
-app_token,app_name,date,tracker_token,network,country,install_cost,click_cost,impression_cost,cost,ad_impressions,ad_revenue,paid_installs,paid_clicks,paid_impressions,clicks,impressions,installs,app_id
+campaign,network,app_token,country_code,adgroup,country,app,partner_name,adgroup_network,day,store_id,store_type,source_network,installs,network_installs,clicks,network_clicks,impressions,network_impressions,organic_installs,cost,adjust_cost,network_cost,click_cost,install_cost,impression_cost,ad_revenue,attribution_clicks,app_id,updated_date
+unknown,Organic,wlf2mllai4n4,us,unknown,United States,Survival Hero,Organic,unknown,2023-12-28,com.nmg.survivalhero,google_play,unknown,8,0,0,0,0,0,8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,hero_survival,2024-01-02 15:13:48
+unknown,Organic,wlf2mllai4n4,vn,unknown,Viet Nam,Survival Hero,Organic,unknown,2023-12-26,com.nmg.survivalhero,google_play,unknown,2,0,0,0,0,0,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0,hero_survival,2024-01-02 15:13:48

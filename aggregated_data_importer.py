@@ -76,14 +76,14 @@ def pull_adjust_data(start_date, end_date):
     #     END_DATE=end_date,
     #     USER_TOKEN=api_token
     # )
-    base_url = "https://dash.adjust.com/control-center/reports-service/report?ad_spend_mode=network&app_token__in={app_tokens}&date_period={date_period}&dimensions={dimensions}&metrics={metrics}"
+    base_url = "https://dash.adjust.com/control-center/reports-service/report?ad_spend_mode=network&sandbox=true&app_token__in={app_tokens}&date_period={date_period}&dimensions={dimensions}&metrics={metrics}"
     api_url = base_url.format(
         app_tokens=",".join(apps_token),
         date_period=start_date + ":" + end_date,
         dimensions=groupby,
         metrics=kpis,
     )
-
+    logger.info("Pulling data from {} to {}".format(start_date, end_date))
     # response = pd.read_csv(api_url)
     response = rq.get(
         api_url,
@@ -114,7 +114,7 @@ def transform_data(response, app):
     this_app_token = app["info"]["app_token"]
     df_to_write = response[response["app_token"] == this_app_token]
     df_to_write["app_id"] = app["info"]["app_id"]
-    df_to_write["updated_date"] = datetime.datetime.now().strftime("%Y-%m-%d")
+    df_to_write["updated_date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     df_to_write = df_to_write[
         [
             "campaign",
@@ -164,11 +164,14 @@ def import_data_bigquery(df):
     """
     total_rows = 0
     for app in app_info:
+        logger.info("Importing data of {}".format(app["app_name"]))
         df_to_write = transform_data(df, app)
         df_to_write.to_csv(temp_file, index=False)
 
-        logger.debug(
-            "{} rows + to file + {}".format(df_to_write.shape[0], app["info"]["app_id"])
+        logger.info(
+            "Pulled {} rows to file {}".format(
+                df_to_write.shape[0], app["info"]["app_id"]
+            )
         )
 
         total_rows += csv_to_bigquery(app=app)
@@ -187,9 +190,13 @@ def csv_to_bigquery(app):
 
         job.result()
 
+    update_data(table_id)
+
     row_after = client.get_table(table_id).num_rows
     row_imported = row_after - row_before
-    logger.debug("App {}: Imported {} rows".format(app, row_imported))
+    logger.info(
+        "Table {}: Imported {} rows".format(app["info"]["table_id"], row_imported)
+    )
 
     return row_imported
 
@@ -206,7 +213,7 @@ def get_or_create_table(table_id):
         _, schema = make_job_config()
         table = bigquery.Table(table_id, schema=schema)
         table.time_partitioning = bigquery.TimePartitioning(
-            type_=bigquery.TimePartitioningType.DAY, field="date", expiration_ms=None
+            type_=bigquery.TimePartitioningType.DAY, field="day", expiration_ms=None
         )
         table = client.create_table(table)
         logger.info(
@@ -249,7 +256,7 @@ def make_job_config():
         bigquery.SchemaField("ad_revenue", "FLOAT"),
         bigquery.SchemaField("attribution_clicks", "STRING"),
         bigquery.SchemaField("app_id", "STRING"),
-        bigquery.SchemaField("updated_date", "DATE"),
+        bigquery.SchemaField("updated_date", "DATETIME"),
     ]
 
     job_config = bigquery.LoadJobConfig(
@@ -270,6 +277,25 @@ def import_logger(data_date, report_name, rows_imported):
     )
     log_df.to_csv(".\data\import_log.csv", index=False)
 
+    schema = [
+        bigquery.SchemaField("data_date", "DATE", mode="REQUIRED"),
+        bigquery.SchemaField("import_date", "DATETIME", mode="REQUIRED"),
+        bigquery.SchemaField("report_name", "STRING"),
+        bigquery.SchemaField("rows_imported", "INTEGER"),
+    ]
+    job_config = bigquery.LoadJobConfig(
+        schema=schema, skip_leading_rows=1, write_disposition="WRITE_APPEND"
+    )
+
+    with open(".\data\import_log.csv", mode="rb") as source_file:
+        job = client.load_table_from_file(
+            source_file,
+            "data-import-409408.logs.ironsource_logs",
+            job_config=job_config,
+        )
+        job.result()
+    logger.info("--Done--")
+
 
 def send_email(receiver_email, e):
     port = 465  # For SSL
@@ -287,3 +313,23 @@ def send_email(receiver_email, e):
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
         server.login(email_config["sender"], email_config["password"])
         server.sendmail(email_config["sender"], receiver_email, message)
+
+
+def update_data(table_id):
+    query = """
+        create or replace table `{table_id}`
+        partition by day
+        as
+        select * except(rn)
+        from (
+        SELECT 
+            *,
+            row_number() over(partition by campaign, network, app_token, country_code, adgroup, country, app, partner_name, adgroup_network, day, store_id, store_type, source_network, app_id order by updated_date desc) as rn
+        FROM `{table_id}`
+        )
+        where rn=1
+    """.format(
+        table_id=table_id
+    )
+    query_job = client.query(query)
+    query_job.result()
