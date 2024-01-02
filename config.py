@@ -8,27 +8,15 @@ end_date = str(datetime.date.today() - datetime.timedelta(days=1))
 json_keys = "data-import-409408-97adc8924579.json"
 
 # adjust account api token
-api_token = "<adjust API token>"
+# api_token = "<adjust API token>"
+api_token = "yJLV5vBb2-LhGpc4Tukj"
 
 # app token in adjust dashboard
 apps_token = ["9qr22ik5f30g", "weh64bmgqg3k"]
 
 # Metrics and dimensions
-kpis = [
-    "install_cost",
-    "click_cost",
-    "impression_cost",
-    "cost",
-    "ad_impressions",
-    "ad_revenue",
-    "paid_installs",
-    "paid_clicks",
-    "paid_impressions",
-    "clicks",
-    "impressions",
-    "installs",
-]
-groupby = "apps,days,networks,countries"
+kpis = "installs,network_installs,clicks,network_clicks,impressions,network_impressions,organic_installs,cost,adjust_cost,network_cost,click_cost,install_cost,impression_cost,ad_revenue,attribution_clicks"
+groupby = "app_token,day,app,partner_name,campaign,network,country,country_code,adgroup_network,adgroup,store_id,store_type,source_network"
 
 # local temp file name
 temp_file = ".\\data\\adjuts_data.csv "

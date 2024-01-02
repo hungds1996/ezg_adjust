@@ -6,14 +6,15 @@ import datetime
 import argparse
 import smtplib, ssl
 import traceback
+import requests as rq
 import sys
 
 from config import *
 
 logging.basicConfig(
-    level=logging.INFO, 
-    filename='./logs/adjust.log', 
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO,
+    filename="./logs/adjust.log",
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ def get_client():
     """Builds a bigquery client with the given json key file."""
     credentials = service_account.Credentials.from_service_account_file(json_keys)
     return bigquery.Client(credentials=credentials)
+
 
 client = get_client()
 
@@ -54,28 +56,50 @@ def get_start_end_date(report_name):
     else:
         end_date = datetime.date.today() - datetime.timedelta(days=2)
         end_date = end_date.strftime("%Y-%m-%d")
-    
+
     if start_date > end_date:
-        raise Exception("Start date ({}) must be smaller than end date ({})".format(start_date, end_date))
-    
+        raise Exception(
+            "Start date ({}) must be smaller than end date ({})".format(
+                start_date, end_date
+            )
+        )
+
     return start_date, end_date
 
+
 def pull_adjust_data(start_date, end_date):
-    api_url = 'https://api.adjust.com/kpis/v1/{APP_TOKENS}.csv?kpis={KPIS}&grouping={GROUPBY}&start_date={START_DATE}&end_date={END_DATE}&user_token={USER_TOKEN}'.format(
-        APP_TOKENS=",".join(apps_token),
-        KPIS=",".join(kpis),
-        GROUPBY=groupby,
-        START_DATE=start_date,
-        END_DATE=end_date,
-        USER_TOKEN=api_token
+    # api_url = 'https://api.adjust.com/kpis/v1/{APP_TOKENS}.csv?kpis={KPIS}&grouping={GROUPBY}&start_date={START_DATE}&end_date={END_DATE}&user_token={USER_TOKEN}'.format(
+    #     APP_TOKENS=",".join(apps_token),
+    #     KPIS=",".join(kpis),
+    #     GROUPBY=groupby,
+    #     START_DATE=start_date,
+    #     END_DATE=end_date,
+    #     USER_TOKEN=api_token
+    # )
+    base_url = "https://dash.adjust.com/control-center/reports-service/report?ad_spend_mode=network&app_token__in={app_tokens}&date_period={date_period}&dimensions={dimensions}&metrics={metrics}"
+    api_url = base_url.format(
+        app_tokens=",".join(apps_token),
+        date_period=start_date + ":" + end_date,
+        dimensions=groupby,
+        metrics=kpis,
     )
-    try:
-        response = pd.read_csv(api_url)
-    
-        return response
-    except Exception as e:
-        raise Exception("Adjust API ERROR: {}".format(e))
-    
+
+    # response = pd.read_csv(api_url)
+    response = rq.get(
+        api_url,
+        headers={"Authorization": "Bearer " + api_token},
+    ).json()
+
+    if "error_code" in response:
+        raise Exception("Adjust API ERROR: {}".format(response["error_desc"]))
+
+    df = pd.DataFrame(response["rows"])
+    if len(df) == 0:
+        raise Exception("Adjust API ERROR: No data returned")
+    df = df.drop(["attr_dependency"], axis=1)
+
+    return df
+
 
 def transform_data(response, app):
     """Transform data to match with bigquery schema
@@ -87,17 +111,53 @@ def transform_data(response, app):
     Returns:
         pandas DataFrame: Dataframe with app_id column
     """
-    this_app_token = app['info']['app_token']
-    df_to_write = response[response['app_token']==this_app_token]
-    df_to_write['app_id'] = app['info']['app_id']
+    this_app_token = app["info"]["app_token"]
+    df_to_write = response[response["app_token"] == this_app_token]
+    df_to_write["app_id"] = app["info"]["app_id"]
+    df_to_write["updated_date"] = datetime.datetime.now().strftime("%Y-%m-%d")
+    df_to_write = df_to_write[
+        [
+            "campaign",
+            "network",
+            "app_token",
+            "country_code",
+            "adgroup",
+            "country",
+            "app",
+            "partner_name",
+            "adgroup_network",
+            "day",
+            "store_id",
+            "store_type",
+            "source_network",
+            "installs",
+            "network_installs",
+            "clicks",
+            "network_clicks",
+            "impressions",
+            "network_impressions",
+            "organic_installs",
+            "cost",
+            "adjust_cost",
+            "network_cost",
+            "click_cost",
+            "install_cost",
+            "impression_cost",
+            "ad_revenue",
+            "attribution_clicks",
+            "app_id",
+            "updated_date",
+        ]
+    ]
 
     return df_to_write
+
 
 def import_data_bigquery(df):
     """loop through the dataframe and import data of each app to bigquery
 
     Args:
-        df (pandas dataframe): 
+        df (pandas dataframe):
 
     Returns:
         int: total rows imported
@@ -105,37 +165,35 @@ def import_data_bigquery(df):
     total_rows = 0
     for app in app_info:
         df_to_write = transform_data(df, app)
-        df_to_write.to_csv(temp_file, index=False) 
-        
-        logger.debug('{} rows + to file + {}'.format(df_to_write.shape[0],app['info']['app_id']))
-        
-        total_rows += csv_to_bigquery(app=app)   
+        df_to_write.to_csv(temp_file, index=False)
+
+        logger.debug(
+            "{} rows + to file + {}".format(df_to_write.shape[0], app["info"]["app_id"])
+        )
+
+        total_rows += csv_to_bigquery(app=app)
     return total_rows
 
 
 def csv_to_bigquery(app):
-    table_id = app['info']['table_id']
+    table_id = app["info"]["table_id"]
     table = get_or_create_table(table_id)
-    
+
     row_before = table.num_rows
-    
+
     job_config, _ = make_job_config()
-    with open(temp_file, mode='rb') as source_file:
-        job = client.load_table_from_file(
-            source_file, 
-            table_id, 
-            job_config=job_config
-        )
+    with open(temp_file, mode="rb") as source_file:
+        job = client.load_table_from_file(source_file, table_id, job_config=job_config)
 
         job.result()
 
     row_after = client.get_table(table_id).num_rows
-    row_imported = (row_after-row_before)
+    row_imported = row_after - row_before
     logger.debug("App {}: Imported {} rows".format(app, row_imported))
-    
+
     return row_imported
-        
-        
+
+
 def get_or_create_table(table_id):
     """Look for the table in biquery, if not found create a new one
 
@@ -148,9 +206,7 @@ def get_or_create_table(table_id):
         _, schema = make_job_config()
         table = bigquery.Table(table_id, schema=schema)
         table.time_partitioning = bigquery.TimePartitioning(
-            type_=bigquery.TimePartitioningType.DAY,
-            field="date",
-            expiration_ms=None
+            type_=bigquery.TimePartitioningType.DAY, field="date", expiration_ms=None
         )
         table = client.create_table(table)
         logger.info(
@@ -160,35 +216,44 @@ def get_or_create_table(table_id):
         )
         return client.get_table(table_id)
 
+
 def make_job_config():
-    """Declare schema for bigquery table and make job config
-    """
-    schema=[
-        bigquery.SchemaField('app_token', 'STRING'),
-        bigquery.SchemaField('app_name', 'STRING'),
-        bigquery.SchemaField('date', 'DATE'),
-        bigquery.SchemaField('tracker_token', 'STRING'),
-        bigquery.SchemaField('network', 'STRING'),
-        bigquery.SchemaField('country', 'STRING'),
-        bigquery.SchemaField('install_cost', 'FLOAT'),
-        bigquery.SchemaField('click_cost', 'FLOAT'),
-        bigquery.SchemaField('impression_cost', 'FLOAT'),
-        bigquery.SchemaField('cost', 'FLOAT'),
-        bigquery.SchemaField('ad_impressions', 'FLOAT'),
-        bigquery.SchemaField('ad_revenue', 'FLOAT'),
-        bigquery.SchemaField('paid_installs', 'FLOAT'),
-        bigquery.SchemaField('paid_clicks', 'FLOAT'),
-        bigquery.SchemaField('paid_impressions', 'FLOAT'),
-        bigquery.SchemaField('clicks', 'FLOAT'),
-        bigquery.SchemaField('impressions', 'FLOAT'),
-        bigquery.SchemaField('installs', 'FLOAT'),
-        bigquery.SchemaField('app_id', 'STRING'),
+    """Declare schema for bigquery table and make job config"""
+    schema = [
+        bigquery.SchemaField("campaign", "STRING"),
+        bigquery.SchemaField("network", "STRING"),
+        bigquery.SchemaField("app_token", "STRING"),
+        bigquery.SchemaField("country_code", "STRING"),
+        bigquery.SchemaField("adgroup", "STRING"),
+        bigquery.SchemaField("country", "STRING"),
+        bigquery.SchemaField("app", "STRING"),
+        bigquery.SchemaField("partner_name", "STRING"),
+        bigquery.SchemaField("adgroup_network", "STRING"),
+        bigquery.SchemaField("day", "DATE"),
+        bigquery.SchemaField("store_id", "STRING"),
+        bigquery.SchemaField("store_type", "STRING"),
+        bigquery.SchemaField("source_network", "STRING"),
+        bigquery.SchemaField("installs", "FLOAT"),
+        bigquery.SchemaField("network_installs", "FLOAT"),
+        bigquery.SchemaField("clicks", "FLOAT"),
+        bigquery.SchemaField("network_clicks", "FLOAT"),
+        bigquery.SchemaField("impressions", "FLOAT"),
+        bigquery.SchemaField("network_impressions", "FLOAT"),
+        bigquery.SchemaField("organic_installs", "FLOAT"),
+        bigquery.SchemaField("cost", "FLOAT"),
+        bigquery.SchemaField("adjust_cost", "FLOAT"),
+        bigquery.SchemaField("network_cost", "FLOAT"),
+        bigquery.SchemaField("click_cost", "FLOAT"),
+        bigquery.SchemaField("install_cost", "FLOAT"),
+        bigquery.SchemaField("impression_cost", "FLOAT"),
+        bigquery.SchemaField("ad_revenue", "FLOAT"),
+        bigquery.SchemaField("attribution_clicks", "STRING"),
+        bigquery.SchemaField("app_id", "STRING"),
+        bigquery.SchemaField("updated_date", "DATE"),
     ]
-    
+
     job_config = bigquery.LoadJobConfig(
-        schema=schema,
-        skip_leading_rows=1,
-        write_disposition='WRITE_APPEND'
+        schema=schema, skip_leading_rows=1, write_disposition="WRITE_APPEND"
     )
     return job_config, schema
 
@@ -204,7 +269,7 @@ def import_logger(data_date, report_name, rows_imported):
         }
     )
     log_df.to_csv(".\data\import_log.csv", index=False)
-    
+
 
 def send_email(receiver_email, e):
     port = 465  # For SSL
